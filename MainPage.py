@@ -3,6 +3,9 @@ from tkinter import *
 import tkinter as tk
 from Install.install import *
 from HomePage import HomePage
+import time as t
+from Install.install import run,threadreq
+
 
 #=======================================================MainPage====================================================
 class MainPage:
@@ -43,10 +46,14 @@ class MainPage:
     # Function to Show HomePage
     def new_window(self):
         newWindow = tk.Toplevel(self.master)
-        app = HomePage(newWindow)
-        newWindow.state('zoomed')
+        Thread(target = lambda :[threadreq(),HomePage(newWindow),run()]).start()
+
+        # app = HomePage(newWindow)
+        # newWindow.state('zoomed')
+
     
     def press(self):
+        t.sleep(5)
         self.lab02 = tk.Label(self.frame1,bg = 'grey50',text= 'INSTALLED',font=("Helvetica",16,'bold'), fg='white')
         self.lab02.place(relx=.8, rely=.7, anchor=CENTER)
 #=================================================================End=====================================================================

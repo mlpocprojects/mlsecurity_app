@@ -1,8 +1,8 @@
 # Imports 
+from logging import root
 from tkinter import *
 import tkinter as tk
 import os
-from typing_extensions import Self
 import webbrowser
 import validators
 import time as t
@@ -11,7 +11,6 @@ from threading import Thread
 from PIL import Image, ImageTk
 from Button.state import changeState
 from UserPage import UserPage
-from Install.install import threadreq
 import socket
 
 
@@ -19,21 +18,23 @@ import socket
 class HomePage:
     def __init__(self, master):
         self.master = master
-        self.master.geometry("850x900")
+        self.master.geometry("850x150")
         self.master.configure(bg='grey50')
         self.master.title('camera_testing')
 
+        #Reading camera 
+        self.cap = cv2.VideoCapture(0)
+
         #Main frame 
         self.frame2 = tk.Frame(self.master, bg='grey50')
-
         self.button_border = tk.Frame(self.frame2, highlightbackground="black",highlightthickness=2, bd=0)
 
         # User button for User-Management
-        self.user = tk.Button(self.frame2, bg="#242C35", height=3, width=20, bd=4, text='USER',font=("Helvetica",12,'bold'),
+        self.user = tk.Button(self.frame2, bg="#242C35", height=3, width=20, bd=4, text='USER MANAGEMENT',font=("Helvetica",12,'bold'),
                               command=lambda: [self.new_window()], state=DISABLED, fg='white')
         #Start button to run Project                          
-        self.start = tk.Button(self.frame2, bg="#242C35", height=3, width=20, bd=4, text='START',font=("Helvetica",12,'bold'), 
-                                command= lambda : [self.threadlink(),Thread(traget=self.run()).start()], state=DISABLED, fg='white') #self.threadreq(), self.threadlink(),threadreq()
+        self.start = tk.Button(self.frame2, bg="#242C35", height=3, width=20, bd=4, text='START VERIFICATION',font=("Helvetica",12,'bold'), 
+                                command= lambda : [self.threadlink()], state=DISABLED, fg='white')
         #Camera button for camera management 
         self.cameraButton = tk.Button(self.frame2, bg="#242C35", height=3, width=20, text="CAMERA MANAGEMENT",font=("Helvetica",12,'bold'),
                                       command=lambda: [self.press(),
@@ -48,43 +49,15 @@ class HomePage:
 
     # function to pop up Browser 
     def link(self):
-        t.sleep(40)
+        t.sleep(3)
         hostname = "".join(("//", socket.gethostbyname(socket.gethostname()))) 
         links = ":".join(("http",hostname,"8880"))
         webbrowser.open_new(links)
-
-    # run Project file
-    def run(self):
-        print("Running Program")
-        os.system("python Exe_MLSecurity/Runner.py")
-        
-    # def readIt(): ## this is the variable the button changes
-    #     global read
-
-    #     read = 1
-    #     Tk.after(0, readFile)
-
-    # def readFile(self): ## this is the task you want the button to do
-    #     global read
-    #     if read == 1:
-    #         print("Running Program")
-    #         os.system("python Exe_MLSecurity/Runner.py")
-    #         if "task is over":
-    #             read = 0
-    #     if read == 1:
-    #         Tk.after(0, readFile)
         
     # Threading link function    
     def threadlink(self):
         t1 = Thread(target=self.link)
         t1.start()
-
-    # def threadreq(self):
-    #     t2 = Thread(target=self.requirements)
-    #     t2.start()
-    # def threadpress(self):
-    #     t3 = Thread(traget=self.run())
-    #     t3.start()
 
     # hide camera frame 
     def hide_me(self, x):
@@ -96,15 +69,18 @@ class HomePage:
         x.pack(side =LEFT, anchor = NE,padx=30, pady=30, expand = True)
         for i in y:
             i.grid_forget()
+        self.master.state('normal')
+
             
     # Press Function execute when clicked on camera show all camera Management 
     # which include (close , camera link, stop, test camera)  
     def press(self):
         global camera
+        global cap
         camera = tk.StringVar()
         global cam_on
         cam_on = False
-
+        self.master.state('zoomed')
 
         self.frame3 = tk.Frame(self.frame2, highlightbackground="#242C35", highlightthickness=3,bg='grey50')
 
@@ -143,7 +119,7 @@ class HomePage:
         try:
             if validators.url(camera.get()):
                 if cam_on:
-                    ret, frame = cap.read()
+                    ret, frame = self.cap.read()
                     if ret:
                         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         img = Image.fromarray(cv2image).resize((480, 480))
@@ -153,7 +129,7 @@ class HomePage:
         except:
             print("wrong")
         try:
-            ret, frame = cap.read()
+            ret, frame = self.cap.read()
             if ret:
                 cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 img = Image.fromarray(cv2image).resize((480, 480))
@@ -166,8 +142,7 @@ class HomePage:
 
     # Start video frames
     def start_vid(self):
-        global cap , cam_on
-        cap = cv2.VideoCapture(0)
+        global cam_on
         cam_on = True
         self.show_frame()
 
@@ -175,10 +150,10 @@ class HomePage:
     def stop_vid(self):
         global cam_on
         cam_on = False
-        if cap:
-            cap.release()
+        if self.cap:
+            self.cap.release()
             self.display1.config(image="")
-
+            
     # function to open User Management 
     def new_window(self):
         self.newWindow = tk.Toplevel(self.master)

@@ -1,7 +1,7 @@
 # Importing essential files from the program
 import Face_Recog
 from Face_Recog import Main_Model
-from Face_Recog.commons import functions
+from Face_Recog.commons import functions, distance as dst
 from Face_Recog import realtime
 # Flask is used for webstreaming
 from flask import Response
@@ -163,8 +163,19 @@ def embed(model_name, db_path, detector_backend, distance_metric):
     print(model_name, " is built")
     pbar = tqdm(range(0, len(employees)), desc='Finding embeddings')
     input_shape = Face_Recog.commons.functions.find_input_shape(model)
-    input_shape_x = input_shape[0];
+    input_shape_x = input_shape[0]
     input_shape_y = input_shape[1]
+    # if len(employees) > 0:
+    #     model = Face_Recog.Main_Model.build_model(model_name)
+    #     print(model_name," is built")
+	# 	#------------------------
+    #     input_shape = functions.find_input_shape(model)
+    #     input_shape_x = input_shape[0]; input_shape_y = input_shape[1]
+
+	# 	#tuned thresholds for model and metric pair
+    #     threshold = dst.findThreshold(model_name, distance_metric)
+
+    # pbar = tqdm(range(0, len(employees)), desc='Finding embeddings')
 
     embeddings = []
     # for employee in employees:
@@ -174,8 +185,11 @@ def embed(model_name, db_path, detector_backend, distance_metric):
         embedding = []
 
         # preprocess_face returns single face. this is expected for source images in db.
+        # img = functions.normalize_input(img = employee,normalization='Facenet2018' )
         img = functions.preprocess_face(img=employee, target_size=(input_shape_y, input_shape_x),
                                         enforce_detection=False, detector_backend=detector_backend)
+        # img = functions.normalize_input(img = img,normalization='Facenet' )
+
         img_representation = model.predict(img)[0, :]
 
         embedding.append(employee)

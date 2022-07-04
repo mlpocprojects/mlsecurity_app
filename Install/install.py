@@ -27,3 +27,18 @@ def requirements():
 def threadreq():
         t2 = Thread(target=requirements)
         t2.start()
+
+# run Project file
+def run():
+    print("Running Program")
+    os.system("python Exe_MLSecurity/Runner.py")
+
+# def exit_win():
+#     os.system("kill -9 %d"%(os.getppid()))
+#     os._exit(-1)
+#     os._exit()
+#     import subprocess
+#     import sys
+
+#     subprocess.Popen(["mupdf", "/home/dan/Desktop/Sieve-JFP.pdf"])
+#     sys.exit(0)

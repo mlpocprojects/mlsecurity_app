@@ -132,7 +132,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
         print(model_name, " is built")
 
         input_shape = functions.find_input_shape(model)
-        input_shape_x = input_shape[0];
+        input_shape_x = input_shape[0]
         input_shape_y = input_shape[1]
 
         # tuned thresholds for model and metric pair
