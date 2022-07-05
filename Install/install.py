@@ -8,7 +8,6 @@ from threading import Thread
 # install function which will install python exe
 def install():
     print("PYTHON VERSION CHECK--------------")
-
     print(sys.version_info[1])
     if str(sys.version_info[0]) != '3' or str(sys.version_info[1]) <= '6':
         print("Need 3.6 python")
@@ -19,9 +18,9 @@ def install():
 # requirement installation
 def requirements():
         try:
-            os.system('cmd /k "pip install -r Exe_MLSecurity/requirements.txt"')
+            os.system('cmd /k "pip install -r MlSecurity/requirements.txt"')
         except:
-            os.system('cmd /k "pip3 install -r Exe_MLSecurity/requirements.txt"')
+            os.system('cmd /k "pip3 install -r MlSecurity/requirements.txt"')
         print("Requirements installed")
 
 def threadreq():
@@ -31,7 +30,7 @@ def threadreq():
 # run Project file
 def run():
     print("Running Program")
-    os.system("python Exe_MLSecurity/Runner.py")
+    os.system("python MlSecurity/Runner.py")
 
 # def exit_win():
 #     os.system("kill -9 %d"%(os.getppid()))
