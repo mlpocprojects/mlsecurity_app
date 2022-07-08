@@ -13,7 +13,7 @@ from PIL import Image, ImageTk
 from Button.state import changeState
 from Admin.User import UserPage
 import socket
-from Database.utils import *
+# from Database.utils import *
 
 
 #================================================HomePage=====================================================
