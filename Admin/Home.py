@@ -105,36 +105,36 @@ class HomePage:
                         command=lambda: [self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
                                                     self.TestButton, self.stop,self.close),self.stop_vid()])
         
-        # Save camera Button
-        self.Save = tk.Button(self.frame3, bg="#242C35",text="SAVE URL", font=("Helvetica",10,'bold'),
-                                        height=3, fg='white', width=15,command=lambda :[self.save_url()])
+        # # Save camera Button
+        # self.Save = tk.Button(self.frame3, bg="#242C35",text="SAVE URL", font=("Helvetica",10,'bold'),
+        #                                 height=3, fg='white', width=15,command=lambda :[self.save_url()])
 
-        c_values = []
-        get_list(mydb,"SELECT * FROM gias.db_camera", c_values)
-        self.drop = ttk.Combobox(self.frame3, values = c_values,font=("Helvetica",20,'bold'))
+        # c_values = []
+        # get_list(mydb,"SELECT * FROM gias.db_camera", c_values)
+        # self.drop = ttk.Combobox(self.frame3, values = c_values,font=("Helvetica",20,'bold'))
 
         # Child Frame alignment
         self.display1 = tk.Label(self.frame3, bg="#242C35")
         self.lab2.pack(side =LEFT, anchor = NW,padx=10, pady=10, expand = True)
         camera.pack(side =LEFT, anchor = NW, pady=10, expand = True)
-        self.Save.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
+        # self.Save.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
         self.TestButton.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
         self.stop.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
         self.close.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
 
-        self.drop.place(relx=.14, rely=.3, anchor="center",height = 50, width = 250)
+        # self.drop.place(relx=.14, rely=.3, anchor="center",height = 50, width = 250)
 
         self.display1.place(relx=.5, rely=.57, height = 500, width = 500, anchor="center")
         self.frame3.place(relx=.5, rely=.57, anchor="center", height = 600 , width = 1100)
     
-    #To save camera url to database
-    def save_url(self):
-        try:
-            db = mydb
-            s_camera = camera.get()
-            executor(db,f"Insert into gias.db_camera values('{s_camera}')")
-        except :
-            print("Already Exist")
+    # #To save camera url to database
+    # def save_url(self):
+    #     try:
+    #         db = mydb
+    #         s_camera = camera.get()
+    #         executor(db,f"Insert into gias.db_camera values('{s_camera}')")
+    #     except :
+    #         print("Already Exist")
        
     # Function to show camera frame while checking camera link is valid or not
     def show_frame(self):

@@ -79,10 +79,10 @@ class UserPage:
             self.ids.append(self.tree.insert('', 'end', folder, text=folder))
             for name in os.listdir(os.path.join(path,folder)):
                 self.tree.insert(folder, 'end', name, text=name)
-                try:
-                    executor(mydb,f"Insert into gias.db_user values('{folder}','{os.path.join(path,folder)}','{name}')")
-                except:
-                    print("Already exist")
+                # try:
+                #     executor(mydb,f"Insert into gias.db_user values('{folder}','{os.path.join(path,folder)}','{name}')")
+                # except:
+                #     print("Already exist")
 
     # Delete Functionality
     def delete(self):
@@ -93,18 +93,16 @@ class UserPage:
                 for i in os.listdir(os.path.join(os.getcwd() ,"FaceRecog","images",file)):
                     try:
                         os.remove(os.path.join(os.getcwd() ,"FaceRecog","images",file,selected_item))
-                        executor(mydb,f"DELETE FROM gias.db_user WHERE image_name='{selected_item}'")
+                        # executor(mydb,f"DELETE FROM gias.db_user WHERE image_name='{selected_item}'")
                     except:
                         print("no")
                 # write for delete with number image
                 #DELETE FROM gias.db_user WHERE image_name='cc.jpg';
-                executor(mydb,f"DELETE FROM gias.db_user WHERE image_name='{selected_item}'")
         except :
                 print("wrong")
         try:
             shutil.rmtree(os.path.join(os.getcwd(),'FaceRecog','images',str(selected_item)))
-            dbase = mydb
-            executor(dbase,f"DELETE FROM gias.db_user WHERE user_name='{selected_item}'")
+            # executor(mydb,f"DELETE FROM gias.db_user WHERE user_name='{selected_item}'")
         except:
             print("wrong")
         finally:
@@ -135,7 +133,7 @@ class UserPage:
             print(str(os.getcwd() + r"\FaceRecog\images"))
             print("Complete transfer")
             path = os.getcwd() + r"/FaceRecog/images/" + str(name) + "/" + i.split('/')[-1]
-            executor(mydb,f"INSERT INTO gias.db_user values('{str(name)}','{path}','{i.split('/')[-1]}')")
+            # executor(mydb,f"INSERT INTO gias.db_user values('{str(name)}','{path}','{i.split('/')[-1]}')")
         self.root.destroy()
 
     '''
@@ -197,9 +195,9 @@ class UserPage:
                 shutil.copy(i, str(os.getcwd() + r"/FaceRecog/images/" + str(name)))
                 print(str(os.getcwd() + r"\FaceRecog\images"))
                 print("Complete transfer")
-                dbase = mydb
-                path = os.getcwd() + r"/FaceRecog/images/" + str(name) + "/" + i.split('/')[-1]
-                executor(dbase,f"INSERT INTO gias.db_user values('{str(name)}','{path}','{i.split('/')[-1]}')")
+                # dbase = mydb
+                # path = os.getcwd() + r"/FaceRecog/images/" + str(name) + "/" + i.split('/')[-1]
+                # executor(dbase,f"INSERT INTO gias.db_user values('{str(name)}','{path}','{i.split('/')[-1]}')")
         else:
             print("This username already exists")
         self.root.destroy()
