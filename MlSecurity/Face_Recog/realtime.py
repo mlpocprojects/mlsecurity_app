@@ -7,11 +7,11 @@ import mysql.connector
 from tqdm import tqdm
 import numpy as np
 import math
-with open('myfile.txt', 'w') as fp:
-    x = datetime.datetime.now()
-    print(str(x.strftime("%X")))
-    fp.write(str(x.strftime("%X")))
-file1 = open(r"myfile.txt","r+")
+# with open('myfile.txt', 'w') as fp:
+#     x = datetime.datetime.now()
+#     print(str(x.strftime("%X")))
+#     fp.write(str(x.strftime("%X")))
+# file1 = open(r"myfile.txt","r+")
 import cv2
 import time
 import re
@@ -144,9 +144,6 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
     face_included_frames = 0  # freeze screen if face detected sequantially 5 frames
     freezed_frame = 0
 
-
-
-
     cap = cv2.VideoCapture(0)  # webcam
     while (True):
         ret, img = cap.read()
@@ -238,7 +235,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                             values_ = candidate[['employee', 'distance']].values
                             name = employee_name
                             print(name)
-                            temp_name = (name.split("/")[2]).split(".")[0]
+                            temp_name = (name.split("/"))[-2].split("\\")[-1]
                             # Listing(name)
                             # temp_name = Listing(name)
                             # temp_name.split("/")
