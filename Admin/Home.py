@@ -2,6 +2,7 @@
 from logging import root
 from tkinter import *
 import tkinter as tk
+from tkinter import ttk
 import os
 import webbrowser
 import validators
@@ -12,6 +13,7 @@ from PIL import Image, ImageTk
 from Button.state import changeState
 from Admin.User import UserPage
 import socket
+from Database.utils import *
 
 
 #================================================HomePage=====================================================
@@ -24,7 +26,7 @@ class HomePage:
         self.master.resizable(0,0)
 
         #Reading camera 
-        self.cap = cv2.VideoCapture(0)
+        self.cap = None
 
         #Main frame 
         self.frame2 = tk.Frame(self.master, bg='grey50')
@@ -88,7 +90,7 @@ class HomePage:
 
         # self.cameraButton.configure(command=self.hide_me(self.cameraButton))
         # camera entry
-        camera = tk.Entry(self.frame3, textvariable=camera, width=10,font=("Helvetica",34,'bold'))
+        camera = tk.Entry(self.frame3, textvariable=camera, width=10,font=("Helvetica",32,'bold'))
 
         # Test Camera button
         self.TestButton = tk.Button(self.frame3, bg="#242C35",text="TEST CAMERA",font=("Helvetica",10,'bold'),
@@ -102,20 +104,52 @@ class HomePage:
         self.close = tk.Button(self.frame3,bg="#242C35", text="CLOSE",font=("Helvetica",10,'bold'),height=3, width=15, fg='white',
                         command=lambda: [self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
                                                     self.TestButton, self.stop,self.close),self.stop_vid()])
+        
+        # Save camera Button
+        self.Save = tk.Button(self.frame3, bg="#242C35",text="SAVE URL", font=("Helvetica",10,'bold'),
+                                        height=3, fg='white', width=15,command=lambda :[self.save_url()])
+
+        c_values = []
+        get_list(mydb,"SELECT * FROM gias.db_camera", c_values)
+        self.drop = ttk.Combobox(self.frame3, values = c_values,font=("Helvetica",20,'bold'))
 
         # Child Frame alignment
         self.display1 = tk.Label(self.frame3, bg="#242C35")
-        self.lab2.pack(side =LEFT, anchor = NW,padx=30, pady=10, expand = True)
-        camera.pack(side =LEFT, anchor = NW,padx=5, pady=10, expand = True)
-        self.TestButton.pack(side =LEFT, anchor = NW,padx=30, pady=10, expand = True)
-        self.stop.pack(side =LEFT, anchor = NW,padx=30, pady=10, expand = True)
-        self.close.pack(side =LEFT, anchor = NW,padx=30, pady=10, expand = True)
+        self.lab2.pack(side =LEFT, anchor = NW,padx=10, pady=10, expand = True)
+        camera.pack(side =LEFT, anchor = NW, pady=10, expand = True)
+        self.Save.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
+        self.TestButton.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
+        self.stop.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
+        self.close.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
+
+        self.drop.place(relx=.14, rely=.3, anchor="center",height = 50, width = 250)
 
         self.display1.place(relx=.5, rely=.57, height = 500, width = 500, anchor="center")
         self.frame3.place(relx=.5, rely=.57, anchor="center", height = 600 , width = 1100)
+    
+    #To save camera url to database
+    def save_url(self):
+        try:
+            db = mydb
+            s_camera = camera.get()
+            executor(db,f"Insert into gias.db_camera values('{s_camera}')")
+        except :
+            print("Already Exist")
        
     # Function to show camera frame while checking camera link is valid or not
     def show_frame(self):
+        try:
+            if validators.url(self.drop.get()):
+                if cam_on:
+                    ret, frame = self.cap.read()
+                    if ret:
+                        cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                        img = Image.fromarray(cv2image).resize((480, 480))
+                        imgtk = ImageTk.PhotoImage(image=img)
+                        self.display1.imgtk = imgtk
+                        # self.display1.configure(image=imgtk)
+        except:
+            print("wrong")
         try:
             if validators.url(camera.get()):
                 if cam_on:
@@ -125,7 +159,7 @@ class HomePage:
                         img = Image.fromarray(cv2image).resize((480, 480))
                         imgtk = ImageTk.PhotoImage(image=img)
                         self.display1.imgtk = imgtk
-                        self.display1.configure(image=imgtk)
+                        # self.display1.configure(image=imgtk)
         except:
             print("wrong")
         try:
@@ -135,14 +169,16 @@ class HomePage:
                 img = Image.fromarray(cv2image).resize((480, 480))
                 imgtk = ImageTk.PhotoImage(image=img)
                 self.display1.imgtk = imgtk
-                self.display1.configure(image=imgtk)
+                # self.display1.configure(image=imgtk)
         except:
-            print("wrong")
+            print("wrong")     
+        self.display1.configure(image=imgtk)
         self.display1.after(1, self.show_frame)
 
     # Start video frames
     def start_vid(self):
         global cam_on
+        self.cap = cv2.VideoCapture(0)
         cam_on = True
         self.show_frame()
 

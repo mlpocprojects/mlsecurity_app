@@ -22,7 +22,7 @@ class CameraPage:
         self.master.configure(bg='grey50')
         self.master.title('camera_testing')
         #Reading camera 
-        self.cap = cv2.VideoCapture(0)
+        self.cap = None
 
         global camera
         camera = tk.StringVar()
@@ -66,7 +66,7 @@ class CameraPage:
                         img = Image.fromarray(cv2image).resize((480, 480))
                         imgtk = ImageTk.PhotoImage(image=img)
                         self.display1.imgtk = imgtk
-                        self.display1.configure(image=imgtk)
+                        # self.display1.configure(image=imgtk)
         except:
             print("wrong")
         try:
@@ -76,14 +76,17 @@ class CameraPage:
                 img = Image.fromarray(cv2image).resize((480, 480))
                 imgtk = ImageTk.PhotoImage(image=img)
                 self.display1.imgtk = imgtk
-                self.display1.configure(image=imgtk)
+                # self.display1.configure(image=imgtk)
         except:
             print("wrong")
-        self.display1.after(1, self.show_frame)
+        self.display1.configure(image=imgtk)
+        self.display1.after(10, self.show_frame)
 
     # Start video frames
     def start_vid(self):
         global cam_on
+        # self.stop_vid()
+        self.cap = cv2.VideoCapture(0)
         cam_on = True
         self.show_frame()
 
@@ -93,7 +96,7 @@ class CameraPage:
         cam_on = False
         if self.cap:
             self.cap.release()
-            self.display1.config(image="")
+            self.display1.configure(image="")
 
     # destroy window 
     def close_windows(self):
