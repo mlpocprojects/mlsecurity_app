@@ -5,6 +5,7 @@ from Install.install import *
 from Admin.Home import HomePage
 import time as t
 from Install.install import run,threadreq
+from Database.utils import threadentries
 
 
 #=======================================================MainPage====================================================
@@ -47,8 +48,7 @@ class MainPage:
     # Function to Show HomePage
     def new_window(self):
         newWindow = tk.Toplevel(self.master)
-        Thread(target = lambda :[threadreq(),HomePage(newWindow),run()]).start()
-
+        Thread(target = lambda :[threadreq(),threadentries(),HomePage(newWindow),run()]).start()
         # app = HomePage(newWindow)
         # newWindow.state('zoomed')
 

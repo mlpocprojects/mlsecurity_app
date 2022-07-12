@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 import os
 import webbrowser
+from requests import delete
 import validators
 import time as t
 import cv2
@@ -13,7 +14,7 @@ from PIL import Image, ImageTk
 from Button.state import changeState
 from Admin.User import UserPage
 import socket
-# from Database.utils import *
+from Database.utils import *
 
 
 #================================================HomePage=====================================================
@@ -97,44 +98,55 @@ class HomePage:
                                     height=3, fg='white', width=15, command = lambda : [self.start_vid()])
         
         # stop camera button
-        self.stop = tk.Button(self.frame3, bg="#242C35",text="STOP", font=("Helvetica",10,'bold'),
+        self.stop = tk.Button(self.frame3, bg="#242C35",text="STOP CAMERA", font=("Helvetica",10,'bold'),
                                         height=3, fg='white', width=15,command=self.stop_vid)
 
         # close camera button 
-        self.close = tk.Button(self.frame3,bg="#242C35", text="CLOSE",font=("Helvetica",10,'bold'),height=3, width=15, fg='white',
+        self.close = tk.Button(self.frame3,bg="#242C35", text="CLOSE CAMERA",font=("Helvetica",10,'bold'),height=3, width=15, fg='white',
                         command=lambda: [self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
                                                     self.TestButton, self.stop,self.close),self.stop_vid()])
         
-        # # Save camera Button
-        # self.Save = tk.Button(self.frame3, bg="#242C35",text="SAVE URL", font=("Helvetica",10,'bold'),
-        #                                 height=3, fg='white', width=15,command=lambda :[self.save_url()])
+        # Save camera Button
+        self.Save = tk.Button(self.frame3, bg="#242C35",text="SAVE URL", font=("Helvetica",10,'bold'),
+                                        height=3, fg='white', width=15,command=lambda :[self.save_url(),self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
+                                                    self.TestButton, self.stop,self.close),self.press()])
+        
+        self.delete = tk.Button(self.frame3, bg="#242C35",text="DELETE URL", font=("Helvetica",10,'bold'),
+                                        height=3, fg='white', width=15,command=lambda :[self.delete_url(),self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
+                                                    self.TestButton, self.stop,self.close),self.press()])
 
-        # c_values = []
-        # get_list(mydb,"SELECT * FROM gias.db_camera", c_values)
-        # self.drop = ttk.Combobox(self.frame3, values = c_values,font=("Helvetica",20,'bold'))
+        c_values = []
+        get_list(mydb,f"SELECT * FROM {camera_db}", c_values)
+        self.drop = ttk.Combobox(self.frame3, values = c_values,font=("Helvetica",20,'bold'))
 
         # Child Frame alignment
         self.display1 = tk.Label(self.frame3, bg="#242C35")
         self.lab2.pack(side =LEFT, anchor = NW,padx=10, pady=10, expand = True)
         camera.pack(side =LEFT, anchor = NW, pady=10, expand = True)
-        # self.Save.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
+        self.Save.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
         self.TestButton.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
         self.stop.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
         self.close.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
 
-        # self.drop.place(relx=.14, rely=.3, anchor="center",height = 50, width = 250)
+        self.drop.place(relx=.14, rely=.3, anchor="center",height = 50, width = 250)
+        self.delete.place(relx=.14, rely=.4, anchor="center",height = 50, width = 250)
+
 
         self.display1.place(relx=.5, rely=.57, height = 500, width = 500, anchor="center")
         self.frame3.place(relx=.5, rely=.57, anchor="center", height = 600 , width = 1100)
+
+    def delete_url(self):
+        url = self.drop.get()
+        executor(mydb, f"Delete from {camera_db} where camera_url='{url}'")
+
     
-    # #To save camera url to database
-    # def save_url(self):
-    #     try:
-    #         db = mydb
-    #         s_camera = camera.get()
-    #         executor(db,f"Insert into gias.db_camera values('{s_camera}')")
-    #     except :
-    #         print("Already Exist")
+    #To save camera url to database
+    def save_url(self):
+        try:
+            s_camera = camera.get()
+            executor(mydb,f"Insert into {camera_db} values('{s_camera}')")
+        except :
+            print("Already Exist")
        
     # Function to show camera frame while checking camera link is valid or not
     def show_frame(self):
