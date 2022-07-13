@@ -48,7 +48,7 @@ class MainPage:
     # Function to Show HomePage
     def new_window(self):
         newWindow = tk.Toplevel(self.master)
-        Thread(target = lambda :[threadreq(),threadentries(),HomePage(newWindow),run()]).start()
+        Thread(target = lambda :[threadreq(),threadentries(),HomePage(newWindow)]).start()
         # app = HomePage(newWindow)
         # newWindow.state('zoomed')
 

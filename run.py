@@ -21,12 +21,11 @@ def main():
     globa_path = os.path.join(os.getcwd() ,'python-3.6.6-amd64.exe')
     root = tk.Tk()
     if str(sys.version_info[0]) == '3' or str(sys.version_info[1]) >= '6':
-        t0 = Thread(target = lambda :[threadentries(),HomePage(root),run()])#threadreq,run()
+        t0 = Thread(target = lambda :[threadentries(),HomePage(root)])#threadreq,run()
         t0.start()
         root.mainloop()
     else:
         app = MainPage(root)
-        root.state('zoomed')
         root.mainloop()
 
 # def main():
