@@ -144,7 +144,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
     face_included_frames = 0  # freeze screen if face detected sequantially 5 frames
     freezed_frame = 0
 
-    cap = cv2.VideoCapture(0)  # webcam
+    cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)  # webcam
     while (True):
         ret, img = cap.read()
         Blink = Liveness_Blinking.Liveness(ret = ret, frame = img)
@@ -236,9 +236,6 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                             name = employee_name
                             print(name)
                             temp_name = (name.split("/"))[-2].split("\\")[-1]
-                            # Listing(name)
-                            # temp_name = Listing(name)
-                            # temp_name.split("/")
 
                             #print("--------------------------------------------------------------")
                             if best_distance <= threshold - Threshold_setter:
