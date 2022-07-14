@@ -357,7 +357,7 @@ class HomePageD:
     # Function to show camera frame while checking camera link is valid or not
     def show_frame(self):
         try:
-            if validators.url(self.drop.get()):
+            if validators.url(self.drop.focus()):
                 if cam_on:
                     ret, frame = self.cap.read()
                     if ret:
