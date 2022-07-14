@@ -56,7 +56,7 @@ class HomePage:
 
     # function to pop up Browser 
     def link(self):
-        t.sleep(8)
+        t.sleep(15)
         hostname = "".join(("//", socket.gethostbyname(socket.gethostname()))) 
         links = ":".join(("http",hostname,"8880"))
         webbrowser.open_new(links)
@@ -154,7 +154,7 @@ class HomePage:
     # Function to show camera frame while checking camera link is valid or not
     def show_frame(self):
         try:
-            if validators.url(self.drop.get()):
+            if validators.url(self.drop.focus()):
                 if cam_on:
                     ret, frame = self.cap.read()
                     if ret:
