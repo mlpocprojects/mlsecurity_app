@@ -195,6 +195,7 @@ class HomePage:
     def start_vid(self):
         global cam_on
         self.cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+        self.cap.set(cv2.CAP_PROP_FPS, 30)
         cam_on = True
         self.show_frame()
 
@@ -400,6 +401,7 @@ class HomePageD:
     def start_vid(self):
         global cam_on
         self.cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+        self.cap.set(cv2.CAP_PROP_FPS, 30)
         cam_on = True
         self.show_frame()
 
