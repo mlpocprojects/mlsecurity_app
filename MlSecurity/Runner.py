@@ -54,7 +54,7 @@ detector_backend = 'mtcnn'
 '''
 
 
-db_path = r"E:/FaceRec/GUI/FaceRecog"
+db_path = r"FaceRecog"
 
 
 # distance_metric - used to judge distance between video_feed and database image
