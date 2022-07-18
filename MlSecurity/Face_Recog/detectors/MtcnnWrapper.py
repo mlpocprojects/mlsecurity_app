@@ -1,5 +1,7 @@
 import cv2
 from Face_Recog.detectors import FaceDetector
+from cv2 import dnn_superres
+
 
 def build_model():
 	from mtcnn import MTCNN
@@ -29,6 +31,11 @@ def detect_face(face_detector, img, align = True):
 				right_eye = keypoints["right_eye"]
 				detected_face = FaceDetector.alignment_procedure(detected_face, left_eye, right_eye)
 
-			resp.append((detected_face, img_region))
+			# sr = dnn_superres.DnnSuperResImpl_create()
+			# sr.readModel(path = "MlSecurity/Face_Recog/basemodels/FSRCNN-small_x3.pb")
+			# sr.setModel("edsr", 3)
+			imgCrop = cv2.resize(detected_face,(600,600))
+			# imgCro = sr.upsample(imgCrop)
+			resp.append((imgCrop, img_region))
 
-	return resp
+	return resp#,cv2.imwrite("img"+".jpg",imgCrop)

@@ -106,7 +106,7 @@ def get_name():
         #print(Names)
 
     return None
-def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', distance_metric='cosine',
+def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', distance_metric='euclidean_l2',
              source=0, time_threshold=5, frame_threshold=5,enable_multiple=True):
     blinklist = []
     face_detector = FaceDetector.build_model(detector_backend)
@@ -155,7 +155,6 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
         if freeze == False:
             # faces stores list of detected_face and region pair
             faces = FaceDetector.detect_faces(face_detector, detector_backend, img, align=True)
-
             #print(len(faces))
             Listing(len(faces))
 
@@ -174,10 +173,12 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
         detected_faces = []
         face_index = 0
         for face, (x, y, w, h) in faces:
+            # face = cv2.resize(face,(300,300))
             if w > 0:  # discard small detected faces
                 face_detected = True
                 if face_index == 0:
                     face_included_frames = face_included_frames + 1  # increase frame for a single face
+                print((x, y, w, h))
                 detected_faces.append((x, y, w, h))
                 face_index = face_index + 1
 
@@ -188,8 +189,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
 
 
             if freezed_frame == 0:
-
-                freeze_img = base_img.copy()
+                # freeze_img = base_img.copy()
                 Fin_img = base_img.copy()
                 # freeze_img = np.zeros(resolution, np.uint8) #here, np.uint8 handles showing white area issue
                 for detected_face in detected_faces_final:
@@ -201,14 +201,17 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                                   1)  # draw rectangle to main image
 
                     custom_face = base_img[y:y + h, x:x + w]
-
+                    custom_face = cv2.resize(custom_face , (600,600))
+                    # cv2.imwrite("img"+".jpg",custom_face)
                     custom_face = functions.preprocess_face(img=custom_face,
                                                             target_size=(input_shape_y, input_shape_x),
-                                                            enforce_detection=False, detector_backend='mediapipe')
+                                                            enforce_detection=False, detector_backend='mtcnn')
+                    # cv2.resize(custom_face, (400,400))
 
                     # check preprocess_face function handled
                     if custom_face.shape[1:3] == input_shape:
                         if df.shape[0] > 0:  # if there are images to verify, apply face recognition
+                            # cv2.resize(custom_face, (150,150))
                             img1_representation = model.predict(custom_face)[0, :]
 
                             def findDistance(row):
@@ -236,7 +239,10 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                             name = employee_name
                             print(name)
                             temp_name = (name.split("/"))[-2].split("\\")[-1]
-
+                            # Listing(name)
+                            # temp_name = Listing(name)
+                            # temp_name.split("/")
+                            print(best_distance)
                             #print("--------------------------------------------------------------")
                             if best_distance <= threshold - Threshold_setter:
 
@@ -275,9 +281,6 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
             blinklist.append(Blink)
 
 # split analysis into two parts and return necessary stuff from
-
-
-
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 

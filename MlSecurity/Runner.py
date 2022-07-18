@@ -40,10 +40,11 @@ app = Flask(__name__)
 # app.register_blueprint(request_api.get_blueprint())
 # Initializing Necessary model for recognition/detection
 # Using "Facenet" and "Mediapipe" recommended
-model_name = 'Facenet'
 
-db_path = r"E:/FaceRec/GUI/FaceRecog"
-detector_backend = 'mediapipe'
+
+model_name = 'Facenet512'
+distance_metric = 'euclidean_l2'
+detector_backend = 'mtcnn'
 ''' Options-'opencv',
          'ssd' ,
          'dlib',
@@ -51,8 +52,12 @@ detector_backend = 'mediapipe'
          'retinaface',
          'mediapipe'
 '''
+
+
+db_path = r"E:/FaceRec/GUI/FaceRecog"
+
+
 # distance_metric - used to judge distance between video_feed and database image
-distance_metric = 'cosine'
 input_shape = (224, 224)
 
 
@@ -221,7 +226,7 @@ def index():
 def video():
     return Response(
         realtime.analysis(db_path, detector_backend=detector_backend, df=df, model_name=model_name, time_threshold=1,
-                          frame_threshold=1, distance_metric="cosine"),
+                          frame_threshold=1, distance_metric="euclidean_l2"),
         mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
