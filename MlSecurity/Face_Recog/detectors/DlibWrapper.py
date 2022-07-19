@@ -2,7 +2,8 @@ from pathlib import Path
 import gdown
 import bz2
 import os
-
+import cv2
+import numpy as np
 def build_model():
 
 	home = str(Path.home())
@@ -59,8 +60,12 @@ def detect_face(detector, img, align = True):
 			if align:
 				img_shape = sp(img, detections[idx])
 				detected_face = dlib.get_face_chip(img, img_shape, size = detected_face.shape[0])
+				
 
-			resp.append((detected_face, img_region))
+			norm_img = np.zeros((300, 300))
+			norm_img = cv2.normalize(detected_face, norm_img, 0, 255, cv2.NORM_MINMAX)
+			norm_img = cv2.resize(norm_img, (800,800))
+			resp.append((norm_img, img_region))
 
 
 	return resp

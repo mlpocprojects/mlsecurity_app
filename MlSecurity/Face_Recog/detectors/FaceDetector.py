@@ -59,7 +59,7 @@ def detect_faces(face_detector, detector_backend, img, align=True):
     detect_face = backends.get(detector_backend)
 
     if detect_face:
-        obj = detect_face(face_detector, img, align)
+        obj = detect_face(face_detector, img, align= True)
         # obj stores list of detected_face and region pair
 
         return obj
