@@ -28,16 +28,16 @@ import threading
 #import pafy
 import requests
 notification_time = 5
-Threshold_setter = 0.5
+Threshold_setter = 0.2
 from Face_Recog import  Liveness_Blinking
 Blink_time = 30
 name_list = []
 from urllib3.exceptions import InsecureRequestWarning
 mydb = mysql.connector.connect(host="43.231.124.114",port = "3306", user="parag", passwd="parag", database="securitydb",
                                            auth_plugin='mysql_native_password')
-
 # Suppress only the single warning from urllib3 needed.
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+from scipy.stats import mode
 
 import asyncio
 #my_token  = "f0QJitMCQc6UHtt2pJWa7S:APA91bESm9UDipNbPPA4SG-unn-e6VFInm15Rp4O5IaiaBrcjbBTzEoFzymx2CfkiPwaxaIo5d_wgvWZbOpYFF2Mzmmm_eZWMtYwhQ2JbQc9o7MzbyMOk6H7kUQi4Q7lPE0lBnRDMRxS"
@@ -74,6 +74,12 @@ def api_notification():
 
 # read file and text
 
+# def rescale_frame(frame, percent=75):
+#     width = int(frame.shape[1] * percent/ 100)
+#     height = int(frame.shape[0] * percent/ 100)
+#     dim = (width, height)
+#     return cv2.resize(frame, dim, interpolation =cv2.INTER_AREA)
+
 def get_name():
     if len(name_list)>20:
             People_Count = [i for i in name_list if type(i) == int]
@@ -107,7 +113,7 @@ def get_name():
 
     return None
 def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', distance_metric='euclidean_l2',
-             source=0, time_threshold=5, frame_threshold=5,enable_multiple=True):
+             source=0,time_threshold=5, frame_threshold=5,enable_multiple=True):
     blinklist = []
     face_detector = FaceDetector.build_model(detector_backend)
     print("Detector backend is ", detector_backend)
@@ -134,7 +140,7 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
         input_shape = functions.find_input_shape(model)
         input_shape_x = input_shape[0]
         input_shape_y = input_shape[1]
-
+        print((input_shape_x,input_shape_y))
         # tuned thresholds for model and metric pair
         threshold = dst.findThreshold(model_name, distance_metric)
 
@@ -145,8 +151,11 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
     freezed_frame = 0
 
     cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)  # webcam
+
+    temp_name_list = []
     while (True):
         ret, img = cap.read()
+        # img = rescale_frame(img, percent=75)
         Blink = Liveness_Blinking.Liveness(ret = ret, frame = img)
         #print(Blink)
         if img is None:
@@ -154,9 +163,10 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
         raw_img = img.copy()
         if freeze == False:
             # faces stores list of detected_face and region pair
-            faces = FaceDetector.detect_faces(face_detector, detector_backend, img, align=True)
+            faces = FaceDetector.detect_faces(face_detector,detector_backend, img, align=True)
+            # print(faces)
             #print(len(faces))
-            Listing(len(faces))
+            # Listing(len(faces))
 
             if len(faces) == 0:
                 face_included_frames = 0
@@ -173,8 +183,7 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
         detected_faces = []
         face_index = 0
         for face, (x, y, w, h) in faces:
-            # face = cv2.resize(face,(300,300))
-            if w > 0:  # discard small detected faces
+            if w > 80:  # discard small detected faces
                 face_detected = True
                 if face_index == 0:
                     face_included_frames = face_included_frames + 1  # increase frame for a single face
@@ -193,25 +202,25 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
                 Fin_img = base_img.copy()
                 # freeze_img = np.zeros(resolution, np.uint8) #here, np.uint8 handles showing white area issue
                 for detected_face in detected_faces_final:
-                    x = detected_face[0];
+                    x = detected_face[0]
                     y = detected_face[1]
-                    w = detected_face[2];
+                    w = detected_face[2]
                     h = detected_face[3]
                     cv2.rectangle(Fin_img, (x, y), (x + w, y + h), (67, 67, 67),
                                   1)  # draw rectangle to main image
 
-                    custom_face = base_img[y:y + h, x:x + w]
-                    custom_face = cv2.resize(custom_face , (600,600))
-                    # cv2.imwrite("img"+".jpg",custom_face)
+                    custom_face = base_img[int(y):int(y + h), int(x):int(x + w)]
+                    norm_img = np.zeros((300, 300))
+                    custom_face = cv2.normalize(custom_face, norm_img, 0, 255, cv2.NORM_MINMAX)
+                    custom_face = cv2.resize(custom_face , (224,224))
+                    # custom_face = FaceDetector.detect_faces(face_detector, detector_backend, custom_face, align=True)
+                    cv2.imwrite("img"+".jpg",custom_face)
                     custom_face = functions.preprocess_face(img=custom_face,
                                                             target_size=(input_shape_y, input_shape_x),
                                                             enforce_detection=False, detector_backend='mtcnn')
-                    # cv2.resize(custom_face, (400,400))
-
                     # check preprocess_face function handled
                     if custom_face.shape[1:3] == input_shape:
                         if df.shape[0] > 0:  # if there are images to verify, apply face recognition
-                            # cv2.resize(custom_face, (150,150))
                             img1_representation = model.predict(custom_face)[0, :]
 
                             def findDistance(row):
@@ -239,10 +248,19 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
                             name = employee_name
                             print(name)
                             temp_name = (name.split("/"))[-2].split("\\")[-1]
+                            # temp_name_list = []
+                            # while len(temp_name_list) < 5:
+                            #     temp_name_list.append(temp_name)
+                            # if len(temp_name_list) > 5:
+                            #     temp_name_list = [:-6]
                             # Listing(name)
-                            # temp_name = Listing(name)
-                            # temp_name.split("/")
-                            print(best_distance)
+
+                            #-------------Best of five----------------------------------
+                            temp_name_list.append(temp_name)
+                            if len(temp_name_list)>5:
+                                temp_name_list.pop(0)
+                            print(temp_name_list)
+                            # print(temp_name_list,best_distance)
                             #print("--------------------------------------------------------------")
                             if best_distance <= threshold - Threshold_setter:
 
@@ -256,6 +274,19 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
                                 cv2.rectangle(Fin_img, (10, 10), (210, 50), (67, 67, 67), -10)
                                 cv2.putText(Fin_img, str("Unknown"), (20, 40),
                                             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+                            else:
+                                print(temp_name, best_distance)
+                                print(temp_name_list,best_distance)
+                                # if best_distance >= threshold - 0.15:
+                                if len(temp_name_list) == 5:
+                                    cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
+                                    cv2.putText(Fin_img, str(mode(temp_name_list)[0][0]), (20, 40),
+                                                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)  
+                                else:
+                                    cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
+                                    cv2.putText(Fin_img, str("Unknown"), (20, 40),
+                                                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1) 
+
             toc = time.time()
             #print(blinklist)
             timer = toc - tic
@@ -265,9 +296,9 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
                 Blink = "BLINKING"
             else:
                 Blink = "NOT BLINKING"
-            cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
-            cv2.putText(Fin_img, str(temp_name), (20, 40),
-                                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+            # cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
+            # cv2.putText(Fin_img, str(temp_name), (20, 40),
+            #                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
             threading.Thread(target=get_name).start()
             if Blink == "BLINKING":
                 Blink=1
@@ -297,6 +328,7 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
 
     if cv2.waitKey(1) & 0xFF == ord('q'):  # press q to quit
             pass
+
     # kill open cv things
     cap.release()
     cv2.destroyAllWindows()
