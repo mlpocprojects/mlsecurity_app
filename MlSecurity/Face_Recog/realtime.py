@@ -1,21 +1,20 @@
 import os
 import datetime
 import time
-#image_path = os.environ['images']
-#device_token = os.environ['token']
 import mysql.connector
 from tqdm import tqdm
 import numpy as np
 import math
-# with open('myfile.txt', 'w') as fp:
-#     x = datetime.datetime.now()
-#     print(str(x.strftime("%X")))
-#     fp.write(str(x.strftime("%X")))
-# file1 = open(r"myfile.txt","r+")
 import cv2
 import time
 import re
 import os
+import asyncio
+import threading
+#import pafy
+import requests
+from scipy.stats import mode
+from Face_Recog import  Liveness_Blinking
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -24,28 +23,39 @@ from Face_Recog.commons import functions, distance as dst
 from Face_Recog.detectors import FaceDetector
 from scipy.spatial import distance as dist
 from tensorflow.keras.models import model_from_json
-import threading
-#import pafy
-import requests
-notification_time = 5
-Threshold_setter = 0.2
-from Face_Recog import  Liveness_Blinking
-Blink_time = 30
-name_list = []
 from urllib3.exceptions import InsecureRequestWarning
+
+#image_path = os.environ['images']
+#device_token = os.environ['token']
+
+# with open('myfile.txt', 'w') as fp:
+#     x = datetime.datetime.now()
+#     print(str(x.strftime("%X")))
+#     fp.write(str(x.strftime("%X")))
+# file1 = open(r"myfile.txt","r+")
+
+#----------------------------------------------------------------------------------------------
+notification_time = 5
+Threshold_setter = 0.3
+
+Blink_time = 15
+name_list = []
+#------------------------------------------------------------------------------------------------
+
 mydb = mysql.connector.connect(host="43.231.124.114",port = "3306", user="parag", passwd="parag", database="securitydb",
                                            auth_plugin='mysql_native_password')
 # Suppress only the single warning from urllib3 needed.
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
-from scipy.stats import mode
+#---------------------------------------------------------------------------------------------
 
-import asyncio
 #my_token  = "f0QJitMCQc6UHtt2pJWa7S:APA91bESm9UDipNbPPA4SG-unn-e6VFInm15Rp4O5IaiaBrcjbBTzEoFzymx2CfkiPwaxaIo5d_wgvWZbOpYFF2Mzmmm_eZWMtYwhQ2JbQc9o7MzbyMOk6H7kUQi4Q7lPE0lBnRDMRxS"
 url = "https://43.231.127.150:7788/api/notification/sendnotificationtodevice?\
 deviceToken={}/\
 &message={}&\
 title={}"
 #mycursor = mydb.cursor(buffered=True)
+
+
 
 def get_token():
     mycursor = mydb.cursor(buffered=True)
@@ -68,17 +78,12 @@ def convert(date_time):
 def Listing(name):
     name_list.append(name)
     return None
+
+
 def api_notification():
     name = name_list[-1]
     return str(name)
 
-# read file and text
-
-# def rescale_frame(frame, percent=75):
-#     width = int(frame.shape[1] * percent/ 100)
-#     height = int(frame.shape[0] * percent/ 100)
-#     dim = (width, height)
-#     return cv2.resize(frame, dim, interpolation =cv2.INTER_AREA)
 
 def get_name():
     if len(name_list)>20:
@@ -112,8 +117,12 @@ def get_name():
         #print(Names)
 
     return None
+
+
+
 def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', distance_metric='euclidean_l2',
-             source=0,time_threshold=5, frame_threshold=5,enable_multiple=True):
+                                            source=0,time_threshold=5, frame_threshold=5,enable_multiple=True):
+
     blinklist = []
     face_detector = FaceDetector.build_model(detector_backend)
     print("Detector backend is ", detector_backend)
@@ -141,49 +150,47 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
         input_shape_x = input_shape[0]
         input_shape_y = input_shape[1]
         print((input_shape_x,input_shape_y))
+#--------------------------------------------------------------------------------------------------------   
         # tuned thresholds for model and metric pair
         threshold = dst.findThreshold(model_name, distance_metric)
+
+#---------------------------------------------------------------------------------------------------------
 
     pivot_img_size = 112  # face recognition result image
     freeze = False
     face_detected = False
     face_included_frames = 0  # freeze screen if face detected sequantially 5 frames
     freezed_frame = 0
-
+#---------------------------------------------------------------------------------------------------------
     cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)  # webcam
+    #resolution increase
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 7680 )
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 4320 )
+#--------------------------------------------------------------------------------------------------------
+    temp_name_list = [] #list to store 5 detection.
 
-    temp_name_list = []
     while (True):
         ret, img = cap.read()
-        # img = rescale_frame(img, percent=75)
-        Blink = Liveness_Blinking.Liveness(ret = ret, frame = img)
-        #print(Blink)
+        Blink = Liveness_Blinking.Liveness(ret = ret, frame = img) #Liveness check
+        print(Blink)
         if img is None:
             break
         raw_img = img.copy()
         if freeze == False:
-            # faces stores list of detected_face and region pair
             faces = FaceDetector.detect_faces(face_detector,detector_backend, img, align=True)
-            # print(faces)
-            #print(len(faces))
-            # Listing(len(faces))
-
             if len(faces) == 0:
                 face_included_frames = 0
         else:
             num_faces = 1 if not enable_multiple else len(faces)
-            #num_actions = len(actions)
-            #num_checks = num_actions * num_faces
-            #disable_option = num_checks <= 1 or not prog_bar
-            #pbar = tqdm(range(0, num_checks), desc='Processing Faces', disable=disable_option)
-            #print(num_faces)
             face_response_obj = {}
 
             faces = []
+
+#--------------------------------------------------------------------------------------------
         detected_faces = []
         face_index = 0
         for face, (x, y, w, h) in faces:
-            if w > 80:  # discard small detected faces
+            if w > 160:  # discard small detected faces
                 face_detected = True
                 if face_index == 0:
                     face_included_frames = face_included_frames + 1  # increase frame for a single face
@@ -210,16 +217,15 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
                                   1)  # draw rectangle to main image
 
                     custom_face = base_img[int(y):int(y + h), int(x):int(x + w)]
-                    norm_img = np.zeros((300, 300))
-                    custom_face = cv2.normalize(custom_face, norm_img, 0, 255, cv2.NORM_MINMAX)
-                    custom_face = cv2.resize(custom_face , (224,224))
-                    # custom_face = FaceDetector.detect_faces(face_detector, detector_backend, custom_face, align=True)
-                    cv2.imwrite("img"+".jpg",custom_face)
+
                     custom_face = functions.preprocess_face(img=custom_face,
                                                             target_size=(input_shape_y, input_shape_x),
                                                             enforce_detection=False, detector_backend='mtcnn')
+
                     # check preprocess_face function handled
                     if custom_face.shape[1:3] == input_shape:
+                        print(custom_face.shape[1:3],input_shape)
+
                         if df.shape[0] > 0:  # if there are images to verify, apply face recognition
                             img1_representation = model.predict(custom_face)[0, :]
 
@@ -248,12 +254,6 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
                             name = employee_name
                             print(name)
                             temp_name = (name.split("/"))[-2].split("\\")[-1]
-                            # temp_name_list = []
-                            # while len(temp_name_list) < 5:
-                            #     temp_name_list.append(temp_name)
-                            # if len(temp_name_list) > 5:
-                            #     temp_name_list = [:-6]
-                            # Listing(name)
 
                             #-------------Best of five----------------------------------
                             temp_name_list.append(temp_name)
@@ -274,36 +274,37 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
                                 cv2.rectangle(Fin_img, (10, 10), (210, 50), (67, 67, 67), -10)
                                 cv2.putText(Fin_img, str("Unknown"), (20, 40),
                                             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
-                            else:
-                                print(temp_name, best_distance)
-                                print(temp_name_list,best_distance)
-                                # if best_distance >= threshold - 0.15:
-                                if len(temp_name_list) == 5:
-                                    cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
-                                    cv2.putText(Fin_img, str(mode(temp_name_list)[0][0]), (20, 40),
-                                                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)  
-                                else:
-                                    cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
-                                    cv2.putText(Fin_img, str("Unknown"), (20, 40),
-                                                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1) 
 
+#----------------------------------Blink check ------------------------------------------------------
             toc = time.time()
-            #print(blinklist)
             timer = toc - tic
             if int(timer) % 30 == 0 and sum(blinklist)<4:
                 blinklist=[]
             if Blink > 0:
-                Blink = "BLINKING"
+                Blink2 = "BLINKING"
             else:
-                Blink = "NOT BLINKING"
-            # cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
-            # cv2.putText(Fin_img, str(temp_name), (20, 40),
-            #                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+                Blink2 = "NOT BLINKING"
+
+            if len(temp_name_list) == 5:
+            # print(temp_name_list,best_distance,Blink)
+                cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
+                cv2.putText(Fin_img, str(mode(temp_name_list)[0][0]), (20, 40),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+                cv2.rectangle(Fin_img, (600, 10), (950, 50), (67, 67, 67), -10)
+                cv2.putText(Fin_img, str(Blink2), (610, 40),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)  
+            else:
+                cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
+                cv2.putText(Fin_img, str(""), (20, 40),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+
+#----------------------------------------------------------------------------------------------
             threading.Thread(target=get_name).start()
-            if Blink == "BLINKING":
-                Blink=1
-            else:
-                Blink=0
+#---------------------------------------------------------------------------------------------
+            # if Blink == "BLINKING":
+            #     Blink=1
+            # else:
+            #     Blink=0
             ret, buffer = cv2.imencode('.jpg', Fin_img)
             frame = buffer.tobytes()
             freezed_frame = freezed_frame + 1
@@ -311,7 +312,7 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
             #print(int(timer))
             blinklist.append(Blink)
 
-# split analysis into two parts and return necessary stuff from
+# split analysis into two parts and return necessary stuff from---------------------------------------
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
@@ -325,6 +326,7 @@ def analysis(db_path, df, model_name='Facenet512', detector_backend='mtcnn', dis
             frame2 = buffer.tobytes()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame2 + b'\r\n')
+#--------------------------------------------------------------------------------------------------------
 
     if cv2.waitKey(1) & 0xFF == ord('q'):  # press q to quit
             pass

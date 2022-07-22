@@ -6,10 +6,9 @@ import os
 import re
 from tkinter import ttk, filedialog
 from turtle import left
-# SkyBlue3SteelBlue4
-#242C35
-#grey50
 from Database.utils import *
+from Admin.GuiColor import *
+
 
 
 #===============================================================UserPage==============================================
@@ -21,21 +20,21 @@ class UserPage:
         self.master = master
         self.master.title('User-Management')
         self.master.geometry("1000x650")
-        self.master.configure(bg='grey50')
+        self.master.configure(bg=bg)
         self.master.resizable(0,0)
 
         # self.master.state('zoomed')
         
         # all Child frames inside main frame 
-        self.frame4 = tk.Frame(self.master,bg='grey50')
-        self.frame5 = tk.Frame(self.frame4, highlightbackground="#242C35", highlightthickness=3, bg='grey50')
-        self.frame6 = tk.Frame(self.frame4, highlightbackground="#242C35", highlightthickness=3, bg='grey50', width= 100)
-        self.frame7 = tk.Frame(self.frame4, highlightbackground="#242C35", highlightthickness=3, bg='grey50')
+        self.frame4 = tk.Frame(self.master,bg=bg)
+        self.frame5 = tk.Frame(self.frame4, highlightbackground=bg_1, highlightthickness=3, bg=bg)
+        self.frame6 = tk.Frame(self.frame4, highlightbackground=bg_1, highlightthickness=3, bg=bg, width= 100)
+        self.frame7 = tk.Frame(self.frame4, highlightbackground=bg_1, highlightthickness=3, bg=bg)
 
         # Search entry
         self.my_entry = tk.Entry(self.frame6,font=("Helvetica",20,'bold'), width = 30)
         # search button
-        self.searchbutton = tk.Button(self.frame6,text="SEARCH",font=("Helvetica",14,'bold'),command=self.search, width=30,bg="#242C35", fg='white')
+        self.searchbutton = tk.Button(self.frame6,text="SEARCH",font=("Helvetica",14,'bold'),command=self.search, width=30,bg=bg_1, fg='black')
 
         # alignment for above 
         self.searchbutton.pack(padx = 55 ,pady=5,side = BOTTOM)
@@ -45,7 +44,8 @@ class UserPage:
         self.ysb = Scrollbar(self.frame6, orient='vertical')
         self.xsb = Scrollbar(self.frame6, orient='horizontal')  
         s = ttk.Style()
-        s.configure('Treeview.Heading',  font=("Helvetica",12,'bold'))
+        s.configure('Treeview',  font=("Helvetica",12),rowheight = 30)
+        s.configure('Treeview.Heading',  font=("Helvetica",12,'bold'),rowheight = 30)
 
         self.tree = ttk.Treeview(self.frame6, height= 30,yscrollcommand=self.ysb.set, xscrollcommand=self.xsb.set)
         self.tree.heading('#0', text='EXISTING USERS', anchor='w')
@@ -56,10 +56,10 @@ class UserPage:
         self.tree.pack(side = BOTTOM, pady=20)
 
         # button for user Management 
-        self.AddUser = tk.Button(self.frame7,text='ADD USER',font=("Helvetica",12,'bold'),command=self.press,height=3, width=20 , bg ="#242C35", fg='white' )
-        self.UpdateButton = tk.Button(self.frame7, text='UPDATE USER',font=("Helvetica",12,'bold'),command= lambda : [self.update_Bu(),self.master_destory()],height=3, width=20 , bg ="#242C35", fg='white')
-        self.DeleteButton = tk.Button(self.frame7, text='DELETE USER / IMAGE',font=("Helvetica",12,'bold'),command= lambda:[self.delete(),self.master_destory()],height=3, width=20 , bg ="#242C35", fg='white')
-        self.BrowserButton = tk.Button(self.frame7, text='BROWSE USER',font=("Helvetica",12,'bold'),command= lambda: [self.Brower_but()],height=3, width=20 , bg ="#242C35", fg='white')
+        self.AddUser = tk.Button(self.frame7,text='ADD USER',font=("Helvetica",12,'bold'),command=self.press,height=3, width=20 , bg =bg_1, fg='black' )
+        self.UpdateButton = tk.Button(self.frame7, text='UPDATE USER',font=("Helvetica",12,'bold'),command= lambda : [self.update_Bu(),self.master_destory()],height=3, width=20 , bg =bg_1, fg='black')
+        self.DeleteButton = tk.Button(self.frame7, text='DELETE USER / IMAGE',font=("Helvetica",12,'bold'),command= lambda:[self.delete(),self.master_destory()],height=3, width=20 , bg =bg_1, fg='black')
+        self.BrowserButton = tk.Button(self.frame7, text='BROWSE USER',font=("Helvetica",12,'bold'),command= lambda: [self.Brower_but()],height=3, width=20 , bg =bg_1, fg='black')
 
         # alignment 
         self.DeleteButton.pack(padx=150, pady=30,fill= 'both', side = BOTTOM)
@@ -167,9 +167,9 @@ class UserPage:
     def press(self):
         global user
         user = tk.StringVar()
-        self.lab1 = tk.Label(self.frame7, text="Username",bg ="grey50",font=("Helvetica",16,'bold'), fg='white')
+        self.lab1 = tk.Label(self.frame7, text="Username",bg =bg,font=("Helvetica",16,'bold'), fg='black')
         user = tk.Entry(self.frame7, textvariable=user,font=("Helvetica",14,'bold'))
-        self.addButton = tk.Button(self.frame7, text='Browse',font=("Helvetica",14,'bold'),command=lambda :[self.Upload_New(), self.master_destory()],bg ="#242C35", fg='white')
+        self.addButton = tk.Button(self.frame7, text='Browse',font=("Helvetica",14,'bold'),command=lambda :[self.Upload_New(), self.master_destory()],bg =bg_1, fg='black')
 
         self.lab1.pack(side = TOP, pady= 3)
         user.pack(side = TOP, pady= 3)

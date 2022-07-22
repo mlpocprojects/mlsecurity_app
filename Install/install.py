@@ -30,7 +30,7 @@ def threadreq():
 # run Project file
 def run():
     print("Running Program")
-    os.system("python MlSecurity/Runner.py")
+    os.system("python MlSecurity/runner.py")
 
 # def exit_win():
 #     os.system("kill -9 %d"%(os.getppid()))

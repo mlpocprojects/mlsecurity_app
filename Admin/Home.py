@@ -16,7 +16,7 @@ from Admin.User import UserPage
 import socket
 from Database.utils import *
 from Install.install import run
-# from Admin.HomeD import HomePageD
+from Admin.GuiColor import *
 
 
 
@@ -24,8 +24,8 @@ from Install.install import run
 class HomePage:
     def __init__(self, master):
         self.master = master
-        self.master.geometry("850x150")
-        self.master.configure(bg='grey50')
+        self.master.geometry("400x400")
+        self.master.configure(bg=bg)
         self.master.title('camera_testing')
         self.master.resizable(0,0)
 
@@ -33,25 +33,25 @@ class HomePage:
         self.cap = None
 
         #Main frame 
-        self.frame2 = tk.Frame(self.master, bg='grey50')
+        self.frame2 = tk.Frame(self.master, bg=bg)
         self.button_border = tk.Frame(self.frame2, highlightbackground="black",highlightthickness=2, bd=0)
 
         # User button for User-Management
-        self.user = tk.Button(self.frame2, bg="#242C35", height=3, width=20, bd=4, text='USER MANAGEMENT',font=("Helvetica",12,'bold'),
-                              command=lambda: [self.new_window()], state=DISABLED, fg='white')
+        self.user = tk.Button(self.frame2, bg=bg_1, height=3, width=20, bd=4, text='USER MANAGEMENT',font=("Helvetica",12,'bold'),
+                              command=lambda: [self.new_window()], state=DISABLED, fg='black')
         #Start button to run Project                          
-        self.start = tk.Button(self.frame2, bg="#242C35", height=3, width=20, bd=4, text='START VERIFICATION',font=("Helvetica",12,'bold'), 
-                                command= lambda : [self.threadlink(),self.new_window_1()], state=DISABLED, fg='white')#self.threadlink(),self.new_window_1()
+        self.start = tk.Button(self.frame2, bg=bg_1, height=3, width=20, bd=4, text='START VERIFICATION',font=("Helvetica",12,'bold'), 
+                                command= lambda : [self.threadlink(),self.new_window_1()], state=DISABLED, fg='black')#self.threadlink(),self.new_window_1()
         #Camera button for camera management 
-        self.cameraButton = tk.Button(self.frame2, bg="#242C35", height=3, width=20, text="CAMERA MANAGEMENT",font=("Helvetica",12,'bold'),
+        self.cameraButton = tk.Button(self.frame2, bg=bg_1, height=3, width=20, text="CAMERA MANAGEMENT",font=("Helvetica",12,'bold'),
                                       command=lambda: [self.press(),
-                                                       changeState(self.cameraButton, self.user, self.start)],
-                                      state=NORMAL, fg='white')
+                                                       changeState(self.cameraButton, self.user, self.start),self.retrieve_1(self.cameraButton,self.start,self.user),self.geometry()],
+                                      state=NORMAL, fg='black')
 
         # Frame and button alignment
-        self.user.pack(side =LEFT, anchor = NW,padx=30, pady=30, expand = True)
-        self.start.pack(side = LEFT, expand = True, anchor = N,padx=30, pady=30)
-        self.cameraButton.pack(side =LEFT, anchor = NE,padx=30, pady=30, expand = True)
+        self.cameraButton.pack(side =BOTTOM, anchor = CENTER,padx=30, pady=30, expand = True)
+        self.user.pack(side =BOTTOM, anchor = CENTER,padx=30, pady=30, expand = True)
+        self.start.pack(side = BOTTOM, expand = True, anchor = CENTER,padx=30, pady=30)
         self.frame2.pack(fill="both", expand=True)
 
     # function to pop up Browser 
@@ -66,9 +66,25 @@ class HomePage:
         t1 = Thread(target=self.link)
         t1.start()
 
+    def geometry(self):
+        self.master.geometry("1120x600")
+
     # hide camera frame 
     def hide_me(self, x):
         x.pack_forget()
+
+    def retrieve_1(self, x,y,z):
+        z.pack_forget()
+        y.pack_forget()
+        x.pack_forget()
+
+    def show_1(self):
+        self.master.geometry("400x400")
+        self.cameraButton.pack(side =BOTTOM, anchor = CENTER,padx=30, pady=30, expand = True)
+        self.user.pack(side =BOTTOM, anchor = CENTER,padx=30, pady=30, expand = True)
+        self.start.pack(side = BOTTOM, expand = True, anchor = CENTER,padx=30, pady=30)
+
+
 
     # Retrieve camera frame  
     def retrieve(self, x,z,*y):
@@ -86,36 +102,36 @@ class HomePage:
         camera = tk.StringVar()
         global cam_on
         cam_on = False
-        self.master.state('zoomed')
+        # self.master.state('zoomed')
 
-        self.frame3 = tk.Frame(self.frame2, highlightbackground="#242C35", highlightthickness=3,bg='grey50')
+        self.frame3 = tk.Frame(self.frame2, highlightbackground=bg_1, highlightthickness=3,bg=bg)
 
-        self.lab2 = tk.Label(self.frame3, bg="#242C35",text="CAMERA URL",height=3, width=15,font=("Helvetica",10,'bold'), fg='white')
+        self.lab2 = tk.Label(self.frame3, bg=bg_1,text="CAMERA URL",height=3, width=15,font=("Helvetica",10,'bold'), fg='black')
 
         # self.cameraButton.configure(command=self.hide_me(self.cameraButton))
         # camera entry
         camera = tk.Entry(self.frame3, textvariable=camera, width=10,font=("Helvetica",32,'bold'))
 
         # Test Camera button
-        self.TestButton = tk.Button(self.frame3, bg="#242C35",text="TEST CAMERA",font=("Helvetica",10,'bold'),
-                                    height=3, fg='white', width=15, command = lambda : [self.start_vid()])
+        self.TestButton = tk.Button(self.frame3, bg=bg_1,text="TEST CAMERA",font=("Helvetica",10,'bold'),
+                                    height=3, fg='black', width=15, command = lambda : [self.start_vid()])
         
         # stop camera button
-        self.stop = tk.Button(self.frame3, bg="#242C35",text="STOP CAMERA", font=("Helvetica",10,'bold'),
-                                        height=3, fg='white', width=15,command=self.stop_vid)
+        self.stop = tk.Button(self.frame3, bg=bg_1,text="STOP CAMERA", font=("Helvetica",10,'bold'),
+                                        height=3, fg='black', width=15,command=self.stop_vid)
 
         # close camera button 
-        self.close = tk.Button(self.frame3,bg="#242C35", text="CLOSE CAMERA",font=("Helvetica",10,'bold'),height=3, width=15, fg='white',
+        self.close = tk.Button(self.frame3,bg=bg_1, text="PREVIOUS FRAME",font=("Helvetica",10,'bold'),height=3, width=15, fg='black',
                         command=lambda: [self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
-                                                    self.TestButton, self.stop,self.close),self.stop_vid()])
+                                                    self.TestButton, self.stop,self.close),self.stop_vid(),self.show_1()])
         
         # Save camera Button
-        self.Save = tk.Button(self.frame3, bg="#242C35",text="SAVE URL", font=("Helvetica",10,'bold'),
-                                        height=3, fg='white', width=15,command=lambda :[self.save_url(),self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
+        self.Save = tk.Button(self.frame3, bg=bg_1,text="SAVE URL", font=("Helvetica",10,'bold'),
+                                        height=3, fg='black', width=15,command=lambda :[self.save_url(),self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
                                                     self.TestButton, self.stop,self.close),self.press()])
         
-        self.delete = tk.Button(self.frame3, bg="#242C35",text="DELETE URL", font=("Helvetica",10,'bold'),
-                                        height=3, fg='white', width=15,command=lambda :[self.delete_url(),self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
+        self.delete = tk.Button(self.frame3, bg=bg_1,text="DELETE URL", font=("Helvetica",10,'bold'),
+                                        height=3, fg='black', width=15,command=lambda :[self.delete_url(),self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
                                                     self.TestButton, self.stop,self.close),self.press()])
 
         c_values = []
@@ -123,7 +139,7 @@ class HomePage:
         self.drop = ttk.Combobox(self.frame3, values = c_values,font=("Helvetica",20,'bold'))
 
         # Child Frame alignment
-        self.display1 = tk.Label(self.frame3, bg="#242C35")
+        self.display1 = tk.Label(self.frame3, bg=bg_1)
         self.lab2.pack(side =LEFT, anchor = NW,padx=10, pady=10, expand = True)
         camera.pack(side =LEFT, anchor = NW, pady=10, expand = True)
         self.Save.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
@@ -136,7 +152,7 @@ class HomePage:
 
 
         self.display1.place(relx=.5, rely=.57, height = 500, width = 500, anchor="center")
-        self.frame3.place(relx=.5, rely=.57, anchor="center", height = 600 , width = 1100)
+        self.frame3.place(relx=.5, rely=.5, anchor="center", height = 600 , width = 1100)
 
     def delete_url(self):
         url = self.drop.get()
@@ -228,8 +244,8 @@ class HomePage:
 class HomePageD:
     def __init__(self, master):
         self.master = master
-        self.master.geometry("850x150")
-        self.master.configure(bg='grey50')
+        self.master.geometry("400x400")
+        self.master.configure(bg=bg)
         self.master.title('camera_testing')
         self.master.resizable(0,0)
 
@@ -237,30 +253,30 @@ class HomePageD:
         self.cap = None
 
         #Main frame 
-        self.frame2 = tk.Frame(self.master, bg='grey50')
+        self.frame2 = tk.Frame(self.master, bg=bg)
         self.button_border = tk.Frame(self.frame2, highlightbackground="black",highlightthickness=2, bd=0)
 
         # User button for User-Management
-        self.user = tk.Button(self.frame2, bg="#242C35", height=3, width=20, bd=4, text='USER MANAGEMENT',font=("Helvetica",12,'bold'),
-                              command=lambda: [self.new_window()], state=NORMAL, fg='white')
+        self.user = tk.Button(self.frame2, bg=bg_1, height=3, width=20, bd=4, text='USER MANAGEMENT',font=("Helvetica",12,'bold'),
+                              command=lambda: [self.new_window()], state=NORMAL, fg='black')
         #Start button to run Project                          
-        self.start = tk.Button(self.frame2, bg="#242C35", height=3, width=20, bd=4, text='START VERIFICATION',font=("Helvetica",12,'bold'), 
-                                command= lambda : [self.threadlink(),self.new_window_1()], state=NORMAL, fg='white')#self.threadlink()
+        self.start = tk.Button(self.frame2, bg=bg_1, height=3, width=20, bd=4, text='START VERIFICATION',font=("Helvetica",12,'bold'), 
+                                command= lambda : [self.threadlink(),self.new_window_1()], state=NORMAL, fg='black')#self.threadlink(),self.new_window_1()
         #Camera button for camera management 
-        self.cameraButton = tk.Button(self.frame2, bg="#242C35", height=3, width=20, text="CAMERA MANAGEMENT",font=("Helvetica",12,'bold'),
+        self.cameraButton = tk.Button(self.frame2, bg=bg_1, height=3, width=20, text="CAMERA MANAGEMENT",font=("Helvetica",12,'bold'),
                                       command=lambda: [self.press(),
-                                                       changeState(self.cameraButton, self.user, self.start)],
-                                      state=NORMAL, fg='white')
+                                                       changeState(self.cameraButton, self.user, self.start),self.retrieve_1(self.cameraButton,self.start,self.user),self.geometry()],
+                                      state=NORMAL, fg='black')
 
         # Frame and button alignment
-        self.user.pack(side =LEFT, anchor = NW,padx=30, pady=30, expand = True)
-        self.start.pack(side = LEFT, expand = True, anchor = N,padx=30, pady=30)
-        self.cameraButton.pack(side =LEFT, anchor = NE,padx=30, pady=30, expand = True)
+        self.cameraButton.pack(side =BOTTOM, anchor = CENTER,padx=30, pady=30, expand = True)
+        self.user.pack(side =BOTTOM, anchor = CENTER,padx=30, pady=30, expand = True)
+        self.start.pack(side = BOTTOM, expand = True, anchor = CENTER,padx=30, pady=30)
         self.frame2.pack(fill="both", expand=True)
 
     # function to pop up Browser 
     def link(self):
-        t.sleep(3)
+        t.sleep(15)
         hostname = "".join(("//", socket.gethostbyname(socket.gethostname()))) 
         links = ":".join(("http",hostname,"8880"))
         webbrowser.open_new(links)
@@ -270,9 +286,25 @@ class HomePageD:
         t1 = Thread(target=self.link)
         t1.start()
 
+    def geometry(self):
+        self.master.geometry("1120x600")
+
     # hide camera frame 
     def hide_me(self, x):
         x.pack_forget()
+
+    def retrieve_1(self, x,y,z):
+        z.pack_forget()
+        y.pack_forget()
+        x.pack_forget()
+
+    def show_1(self):
+        self.master.geometry("400x400")
+        self.cameraButton.pack(side =BOTTOM, anchor = CENTER,padx=30, pady=30, expand = True)
+        self.user.pack(side =BOTTOM, anchor = CENTER,padx=30, pady=30, expand = True)
+        self.start.pack(side = BOTTOM, expand = True, anchor = CENTER,padx=30, pady=30)
+
+
 
     # Retrieve camera frame  
     def retrieve(self, x,z,*y):
@@ -290,36 +322,36 @@ class HomePageD:
         camera = tk.StringVar()
         global cam_on
         cam_on = False
-        self.master.state('zoomed')
+        # self.master.state('zoomed')
 
-        self.frame3 = tk.Frame(self.frame2, highlightbackground="#242C35", highlightthickness=3,bg='grey50')
+        self.frame3 = tk.Frame(self.frame2, highlightbackground=bg_1, highlightthickness=3,bg=bg)
 
-        self.lab2 = tk.Label(self.frame3, bg="#242C35",text="CAMERA URL",height=3, width=15,font=("Helvetica",10,'bold'), fg='white')
+        self.lab2 = tk.Label(self.frame3, bg=bg_1,text="CAMERA URL",height=3, width=15,font=("Helvetica",10,'bold'), fg='black')
 
         # self.cameraButton.configure(command=self.hide_me(self.cameraButton))
         # camera entry
         camera = tk.Entry(self.frame3, textvariable=camera, width=10,font=("Helvetica",32,'bold'))
 
         # Test Camera button
-        self.TestButton = tk.Button(self.frame3, bg="#242C35",text="TEST CAMERA",font=("Helvetica",10,'bold'),
-                                    height=3, fg='white', width=15, command = lambda : [self.start_vid()])
+        self.TestButton = tk.Button(self.frame3, bg=bg_1,text="TEST CAMERA",font=("Helvetica",10,'bold'),
+                                    height=3, fg='black', width=15, command = lambda : [self.start_vid()])
         
         # stop camera button
-        self.stop = tk.Button(self.frame3, bg="#242C35",text="STOP CAMERA", font=("Helvetica",10,'bold'),
-                                        height=3, fg='white', width=15,command=self.stop_vid)
+        self.stop = tk.Button(self.frame3, bg=bg_1,text="STOP CAMERA", font=("Helvetica",10,'bold'),
+                                        height=3, fg='black', width=15,command=self.stop_vid)
 
         # close camera button 
-        self.close = tk.Button(self.frame3,bg="#242C35", text="CLOSE CAMERA",font=("Helvetica",10,'bold'),height=3, width=15, fg='white',
+        self.close = tk.Button(self.frame3,bg=bg_1, text="PREVIOUS FRAME",font=("Helvetica",10,'bold'),height=3, width=15, fg='black',
                         command=lambda: [self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
-                                                    self.TestButton, self.stop,self.close),self.stop_vid()])
+                                                    self.TestButton, self.stop,self.close),self.stop_vid(),self.show_1()])
         
         # Save camera Button
-        self.Save = tk.Button(self.frame3, bg="#242C35",text="SAVE URL", font=("Helvetica",10,'bold'),
-                                        height=3, fg='white', width=15,command=lambda :[self.save_url(),self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
+        self.Save = tk.Button(self.frame3, bg=bg_1,text="SAVE URL", font=("Helvetica",10,'bold'),
+                                        height=3, fg='black', width=15,command=lambda :[self.save_url(),self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
                                                     self.TestButton, self.stop,self.close),self.press()])
         
-        self.delete = tk.Button(self.frame3, bg="#242C35",text="DELETE URL", font=("Helvetica",10,'bold'),
-                                        height=3, fg='white', width=15,command=lambda :[self.delete_url(),self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
+        self.delete = tk.Button(self.frame3, bg=bg_1,text="DELETE URL", font=("Helvetica",10,'bold'),
+                                        height=3, fg='black', width=15,command=lambda :[self.delete_url(),self.retrieve(self.cameraButton, self.frame3, self.lab2, camera, 
                                                     self.TestButton, self.stop,self.close),self.press()])
 
         c_values = []
@@ -327,7 +359,7 @@ class HomePageD:
         self.drop = ttk.Combobox(self.frame3, values = c_values,font=("Helvetica",20,'bold'))
 
         # Child Frame alignment
-        self.display1 = tk.Label(self.frame3, bg="#242C35")
+        self.display1 = tk.Label(self.frame3, bg=bg_1)
         self.lab2.pack(side =LEFT, anchor = NW,padx=10, pady=10, expand = True)
         camera.pack(side =LEFT, anchor = NW, pady=10, expand = True)
         self.Save.pack(side =LEFT, anchor = NW,padx=20, pady=10, expand = True)
@@ -340,7 +372,7 @@ class HomePageD:
 
 
         self.display1.place(relx=.5, rely=.57, height = 500, width = 500, anchor="center")
-        self.frame3.place(relx=.5, rely=.57, anchor="center", height = 600 , width = 1100)
+        self.frame3.place(relx=.5, rely=.5, anchor="center", height = 600 , width = 1100)
 
     def delete_url(self):
         url = self.drop.get()
@@ -394,13 +426,13 @@ class HomePageD:
                 self.display1.after(1, self.show_frame)
         except:
             print("wrong")     
-        # self.display1.configure(image=imgtk)
-        # self.display1.after(1, self.show_frame)
 
     # Start video frames
     def start_vid(self):
         global cam_on
         self.cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 7680 )
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 4320 )
         self.cap.set(cv2.CAP_PROP_FPS, 30)
         cam_on = True
         self.show_frame()

@@ -37,14 +37,14 @@ time_buffer = True
 # Needed to ensure streaming works on multiple devices
 lock = threading.Lock()
 app = Flask(__name__)
+
+
 # app.register_blueprint(request_api.get_blueprint())
 # Initializing Necessary model for recognition/detection
 # Using "Facenet" and "Mediapipe" recommended
 
 
-model_name = 'Facenet512'
-distance_metric = 'euclidean_l2'
-detector_backend = 'mtcnn'
+
 ''' Options-'opencv',
          'ssd' ,
          'dlib',
@@ -53,6 +53,9 @@ detector_backend = 'mtcnn'
          'mediapipe'
 '''
 
+model_name = 'Facenet512'
+distance_metric = 'euclidean_l2'
+detector_backend = 'mtcnn'
 
 db_path = r"FaceRecog"
 
@@ -101,31 +104,9 @@ def Facevideo():
     return "Runing"
 
 
-# Embedding Images to dataframe
+# Quil look for how multiface detection look like
 '''
-[1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi',
-1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi',
-1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Akshay', 1, 'Akshay', 1, 'Akshay', 1, 'Akshay', 1, 'Akshay', 1,
-'Rushi', 1, 'Rushi', 1, 'Akshay', 1, 'Rushi', 1, 'Rushi', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi',
-'Akshay', 2, 'Rushi', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 2, 'Rushi', 'Akshay', 3,
-'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay',
-'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi',
-'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3,
-'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi',
-'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay',
-2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2,
-'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi',
-'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3,
-'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay',
-'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 2, 'Rushi',
-'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Pranay', 'Akshay',
-2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Pranay', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2,
-'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi',
-'Akshay', 2, 'Rushi', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay',
-'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Pranay', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi',
-'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Pranay', 'Akshay', 'Akshay', 3, 'Pawan', 'Akshay', 'Akshay', 2,
-'Akshay', 'Akshay', 2, 'Akshay', 'Akshay', 2, 'Akshay', 'Akshay', 2, 'Akshay', 'Akshay', 3, 'Pawan', 'Akshay', 'Akshay',
-3, 'Akshay', 'Akshay', 'Akshay', 3, 'Pawan', 'Akshay', 'Akshay', 3]
+[1, 'Rushi', 1, 'Rushi', 2, 'Akshay', 1, 'Rushi', 2, 'Akshay', 1, 'Rushi', 3, 'Yash']
 '''
 
 
@@ -151,6 +132,7 @@ def get_name():
     return '01'
 
 
+#-----------------------------------embedding function------------------------------------------------
 @app.route('/embed', methods=["GET"])
 def embed(model_name, db_path, detector_backend, distance_metric):
     employees = []
@@ -164,23 +146,16 @@ def embed(model_name, db_path, detector_backend, distance_metric):
                     employees.append(exact_path)
     if len(employees) == 0:
         print("WARNING: There is no image in this path ( ", db_path, ") . Face recognition will not be performed.")
+
+
     model = Face_Recog.Main_Model.build_model(model_name)
     print(model_name, " is built")
+
     pbar = tqdm(range(0, len(employees)), desc='Finding embeddings')
+
     input_shape = Face_Recog.commons.functions.find_input_shape(model)
-    input_shape_x = input_shape[0]
+    input_shape_x = input_shape[0] 
     input_shape_y = input_shape[1]
-    # if len(employees) > 0:
-    #     model = Face_Recog.Main_Model.build_model(model_name)
-    #     print(model_name," is built")
-	# 	#------------------------
-    #     input_shape = functions.find_input_shape(model)
-    #     input_shape_x = input_shape[0]; input_shape_y = input_shape[1]
-
-	# 	#tuned thresholds for model and metric pair
-    #     threshold = dst.findThreshold(model_name, distance_metric)
-
-    # pbar = tqdm(range(0, len(employees)), desc='Finding embeddings')
 
     embeddings = []
     # for employee in employees:
@@ -189,11 +164,8 @@ def embed(model_name, db_path, detector_backend, distance_metric):
         pbar.set_description("Finding embedding for %s" % (employee.split("/")[-1]))
         embedding = []
 
-        # preprocess_face returns single face. this is expected for source images in db.
-        # img = functions.normalize_input(img = employee,normalization='Facenet2018' )
         img = functions.preprocess_face(img=employee, target_size=(input_shape_y, input_shape_x),
                                         enforce_detection=False, detector_backend=detector_backend)
-        # img = functions.normalize_input(img = img,normalization='Facenet' )
 
         img_representation = model.predict(img)[0, :]
 
@@ -203,9 +175,8 @@ def embed(model_name, db_path, detector_backend, distance_metric):
 
     df = pd.DataFrame(embeddings, columns=['employee', 'embedding'])
     df['distance_metric'] = distance_metric
-    # returns dataframe with employee, embedding and distance_metric information
     return df
-
+#----------------------------------------------------------------------------------------------
 
 @app.route('/retrn', methods=["GET"])
 def retrn():
